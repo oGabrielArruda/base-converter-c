@@ -4,6 +4,7 @@
 #include <math.h>
 #define MAX 30
 
+char arrayCaracteres[26] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
 
 int indexOf(char str[MAX], char procurado)
 {
@@ -56,7 +57,7 @@ double algumaParaDez(char numero[MAX], int base)
     return resultado;
 }
 
-char transformarResto(char arrayCaracteres[26], int resto)
+char transformarCharDaBase10(int resto)
 {
     int index = 0;
 
@@ -71,8 +72,6 @@ char transformarResto(char arrayCaracteres[26], int resto)
 
 char* dezParaOutraParteInteira(int numero, int outraBase)
 {
-    char arrayCaracteres[26] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
-
     char *restosInvertidos, *armazenamento = (char*)malloc(MAX*sizeof(char));
     int index, tamanhoDoVetor = 0;
     int resultadoDaDivisao = numero, resto;
@@ -84,7 +83,7 @@ char* dezParaOutraParteInteira(int numero, int outraBase)
         if(tamanhoDoVetor == MAX)
             break;
 
-        char charResto = transformarResto(arrayCaracteres, resto);
+        char charResto = transformarCharDaBase10(resto);
         armazenamento[tamanhoDoVetor++] = charResto;
     }
 
@@ -97,11 +96,40 @@ char* dezParaOutraParteInteira(int numero, int outraBase)
     return restosInvertidos;
 }
 
+char* dezParaOutraParteFracionaria(double frac, int base)
+{
+    char *ret = (char*)malloc(MAX*sizeof(char));
+    int tamanhoDoNumero = 0;
+
+    while(frac != 0)
+    {
+        frac = frac * base;
+        int parteInteira = (int) frac;
+
+        frac = frac - parteInteira;
+        ret[tamanhoDoNumero++] = transformarCharDaBase10(parteInteira);
+    }
+    ret[tamanhoDoNumero] = '\0';
+    return ret;
+}
+
 char* dezParaOutra(double numero, int outraBase)
 {
-    char* parteInteira = dezParaOutraParteInteira((int) numero, outraBase);
-    // parte fracionaria (fazer)
-    return parteInteira;
+    char *parteInteira = dezParaOutraParteInteira((int) numero, outraBase);
+    char *parteFracionaria = dezParaOutraParteFracionaria(numero - (int)numero, outraBase);
+    int lenInteiro = strlen(parteInteira), lenFrac = strlen(parteFracionaria), index = 0;
+
+    char *resultado = (char*)malloc((lenInteiro + lenFrac + 1) * sizeof(char));
+
+    for(index = 0; index < lenInteiro; index++)
+        resultado[index] = parteInteira[index];
+
+    resultado[index] = ',';
+    for(index = 0; index < lenFrac; index++)
+        resultado[index+lenInteiro+1] = parteFracionaria[index];
+    resultado[index]  = '\0';
+
+    return resultado;
 }
 
 
@@ -117,7 +145,7 @@ int main()
     fflush(stdin);
 
     resultado = algumaParaDez(numeroInicial, baseInicial);
-    char* res = dezParaOutra(resultado, baseDesejada);
+    char *res = dezParaOutra(resultado, baseDesejada);
     printf("%s\n", res);
 
 
