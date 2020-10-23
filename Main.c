@@ -135,18 +135,26 @@ char* dezParaOutra(double numero, int outraBase)
 
 int main()
 {
-    char numeroInicial[MAX];
+    char numeroInicial[MAX], *resultado;
     unsigned int baseInicial, baseDesejada;
-    double resultado;
 
+    printf("--------------------------------------------------\n");
+    printf("CONVERSOR DE NUMEROS EM DIFERENTES BASES NUMERICAS\n");
+    printf("--------------------------------------------------\n");
+
+    printf("Digite o numero que se deseja converter: \n");
     fgets(numeroInicial, MAX, stdin);
+
+    printf("\nDigite a base do numero digitado:\n");
     scanf("%u", &baseInicial);
+
+    printf("\nDigite agora a base para que se deseja converter o numero:\n");
     scanf("%u", &baseDesejada);
     fflush(stdin);
 
-    resultado = algumaParaDez(numeroInicial, baseInicial);
-    char *res = dezParaOutra(resultado, baseDesejada);
-    printf("%s\n", res);
+    resultado = dezParaOutra(algumaParaDez(numeroInicial, baseInicial), baseDesejada);
+    printf("\nO numero %sna base %d convertido para a base %d eh igual a: \n\n", numeroInicial, baseInicial, baseDesejada);
+    printf("%s\n\n\n", resultado);
 
 
     return 0;
