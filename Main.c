@@ -17,6 +17,16 @@ int indexOf(char str[MAX], char procurado)
     return -1;
 }
 
+void replace(char* str, char toReplace, char newChar)
+{
+    int index;
+    int length = strlen(str);
+
+    for(index = 0; index < length; index++)
+        if(str[index] == toReplace)
+            str[index] = newChar;
+}
+
 double getValorDoCharNaBaseDez(char c)
 {
     if(isdigit(c))
@@ -34,7 +44,7 @@ double algumaParaDez(char numero[MAX], int base)
     int index, posicaoDaVirgula, potenciaBasePraDez = 0;
     int length = strlen(numero)-1;
 
-    posicaoDaVirgula = indexOf(numero, ',');
+    posicaoDaVirgula = indexOf(numero, '.');
     if(posicaoDaVirgula == -1) posicaoDaVirgula = length;
 
     // percorre os valores antes da vírgula
@@ -93,21 +103,32 @@ char* dezParaOutraParteInteira(int numero, int outraBase)
         restosInvertidos[index] = armazenamento[tamanhoDoVetor-(index+1)];
     }
     free(armazenamento);
+
+    restosInvertidos[tamanhoDoVetor] = ',';
+    restosInvertidos[tamanhoDoVetor+1] = '\0';
     return restosInvertidos;
 }
 
 char* dezParaOutraParteFracionaria(double frac, int base)
 {
     char *ret = (char*)malloc(MAX*sizeof(char));
-    int tamanhoDoNumero = 0;
+    if(frac == 0)
+    {
+        ret[0] = '0';
+        ret[1] = '\0';
+        return ret;
+    }
 
-    while(frac != 0)
+    int tamanhoDoNumero = 0, count = 0;
+
+    while(frac != 0 && count != 5)
     {
         frac = frac * base;
         int parteInteira = (int) frac;
 
         frac = frac - parteInteira;
         ret[tamanhoDoNumero++] = transformarCharDaBase10(parteInteira);
+        count++;
     }
     ret[tamanhoDoNumero] = '\0';
     return ret;
@@ -115,46 +136,50 @@ char* dezParaOutraParteFracionaria(double frac, int base)
 
 char* dezParaOutra(double numero, int outraBase)
 {
-    char *parteInteira = dezParaOutraParteInteira((int) numero, outraBase);
-    char *parteFracionaria = dezParaOutraParteFracionaria(numero - (int)numero, outraBase);
-    int lenInteiro = strlen(parteInteira), lenFrac = strlen(parteFracionaria), index = 0;
+    int pInteiraNumero = floor(numero);
+    double pFracNumero = numero - pInteiraNumero ;
 
-    char *resultado = (char*)malloc((lenInteiro + lenFrac + 1) * sizeof(char));
+    char *parteInteira = dezParaOutraParteInteira(pInteiraNumero, outraBase);
+    char *parteFracionaria = dezParaOutraParteFracionaria(pFracNumero, outraBase);
 
-    for(index = 0; index < lenInteiro; index++)
-        resultado[index] = parteInteira[index];
+    strcat(parteInteira, parteFracionaria);
 
-    resultado[index] = ',';
-    for(index = 0; index < lenFrac; index++)
-        resultado[index+lenInteiro+1] = parteFracionaria[index];
-    resultado[index]  = '\0';
-
-    return resultado;
+    return parteInteira;
 }
 
 
 int main()
 {
-    char numeroInicial[MAX], *resultado;
-    unsigned int baseInicial, baseDesejada;
-
     printf("--------------------------------------------------\n");
     printf("CONVERSOR DE NUMEROS EM DIFERENTES BASES NUMERICAS\n");
     printf("--------------------------------------------------\n");
 
-    printf("Digite o numero que se deseja converter: \n");
-    fgets(numeroInicial, MAX, stdin);
+    int opcao = 1;
 
-    printf("\nDigite a base do numero digitado:\n");
-    scanf("%u", &baseInicial);
+    do
+    {
+        char numeroInicial[MAX], *resultado;
+        unsigned int baseInicial, baseDesejada;
 
-    printf("\nDigite agora a base para que se deseja converter o numero:\n");
-    scanf("%u", &baseDesejada);
-    fflush(stdin);
+        printf("Digite o numero que se deseja converter: \n");
+        fgets(numeroInicial, MAX, stdin);
+        replace(numeroInicial, ',', '.');
 
-    resultado = dezParaOutra(algumaParaDez(numeroInicial, baseInicial), baseDesejada);
-    printf("\nO numero %sna base %d convertido para a base %d eh igual a: \n\n", numeroInicial, baseInicial, baseDesejada);
-    printf("%s\n\n\n", resultado);
+        printf("\nDigite a base do numero digitado:\n");
+        scanf("%u", &baseInicial);
+
+        printf("\nDigite agora a base para que se deseja converter o numero:\n");
+        scanf("%u", &baseDesejada);
+        fflush(stdin);
+
+
+        double alg = algumaParaDez(numeroInicial, baseInicial);
+
+        resultado = dezParaOutra(alg, baseDesejada);
+        printf("\nO numero %sna base %d convertido para a base %d eh igual a: \n\n", numeroInicial, baseInicial, baseDesejada);
+        printf("%s\n\n\n", resultado);
+    }
+    while(opcao == 1);
 
 
     return 0;
