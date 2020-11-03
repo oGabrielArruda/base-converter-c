@@ -158,26 +158,65 @@ int main()
 
     do
     {
+        char ehNegativo = 0;
         char numeroInicial[MAX], *resultado;
         unsigned int baseInicial, baseDesejada;
 
         printf("Digite o numero que se deseja converter: \n");
+        fflush(stdout);
         fgets(numeroInicial, MAX, stdin);
-        replace(numeroInicial, ',', '.');
+        fflush(stdin);
 
         printf("\nDigite a base do numero digitado:\n");
+        fflush(stdout);
         scanf("%u", &baseInicial);
+        fflush(stdin);
 
         printf("\nDigite agora a base para que se deseja converter o numero:\n");
+        fflush(stdout);
         scanf("%u", &baseDesejada);
         fflush(stdin);
 
-
-        double alg = algumaParaDez(numeroInicial, baseInicial);
-
-        resultado = dezParaOutra(alg, baseDesejada);
         printf("\nO numero %sna base %d convertido para a base %d eh igual a: \n\n", numeroInicial, baseInicial, baseDesejada);
-        printf("%s\n\n\n", resultado);
+        fflush(stdout);
+
+        replace(numeroInicial, ',', '.');
+
+        if(indexOf(numeroInicial, '-') == 0)
+        {
+            int index;
+            for(index = 0; index < strlen(numeroInicial); index++)
+                numeroInicial[index] = numeroInicial[index+1];
+            ehNegativo = 1;
+        }
+
+
+        if(baseInicial == baseDesejada)
+            resultado = numeroInicial;
+        else
+        {
+            double nmrNaBaseDez;
+            if(baseInicial != 10)
+                nmrNaBaseDez = algumaParaDez(numeroInicial, baseInicial);
+            else
+                sscanf(numeroInicial, "%lf", &nmrNaBaseDez);
+
+            if(baseDesejada != 10)
+                resultado = dezParaOutra(nmrNaBaseDez, baseDesejada);
+            else
+            {
+                char buff[50];
+                sprintf(buff, "%f", nmrNaBaseDez);
+                resultado = buff;
+            }
+        }
+
+        if(ehNegativo) printf("-%s\n\n\n", resultado);
+        else printf("%s\n", resultado);
+
+
+        printf("Digite \n1 - Para continuar");
+        scanf("%d", &opcao);
     }
     while(opcao == 1);
 
