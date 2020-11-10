@@ -137,7 +137,7 @@ char* dezParaOutraParteFracionaria(double frac, int base)
 char* dezParaOutra(double numero, int outraBase)
 {
     int pInteiraNumero = floor(numero);
-    double pFracNumero = numero - pInteiraNumero ;
+    double pFracNumero = numero - pInteiraNumero;
 
     char *parteInteira = dezParaOutraParteInteira(pInteiraNumero, outraBase);
     char *parteFracionaria = dezParaOutraParteFracionaria(pFracNumero, outraBase);
@@ -147,6 +147,32 @@ char* dezParaOutra(double numero, int outraBase)
     return parteInteira;
 }
 
+
+
+char* calcular(char* numeroInicial, unsigned int baseInicial, unsigned int baseDesejada)
+{
+    char *resultado;
+    if(baseInicial == baseDesejada)
+        resultado = numeroInicial;
+    else
+    {
+        double nmrNaBaseDez;
+        if(baseInicial != 10)
+            nmrNaBaseDez = algumaParaDez(numeroInicial, baseInicial);
+        else
+            sscanf(numeroInicial, "%lf", &nmrNaBaseDez);
+
+        if(baseDesejada != 10)
+            resultado = dezParaOutra(nmrNaBaseDez, baseDesejada);
+        else
+        {
+            char* buff = (char*)malloc(MAX * sizeof(char));
+            sprintf(buff, "%f", nmrNaBaseDez);
+            resultado = buff;
+        }
+    }
+    return resultado;
+}
 
 int main()
 {
@@ -162,23 +188,20 @@ int main()
         char numeroInicial[MAX], *resultado;
         unsigned int baseInicial, baseDesejada;
 
-        printf("Digite o numero que se deseja converter: \n");
+        printf("Digite o numero que se deseja converter: ");
         fflush(stdout);
         fgets(numeroInicial, MAX, stdin);
         fflush(stdin);
 
-        printf("\nDigite a base do numero digitado:\n");
+        printf("\nDigite a base do numero digitado: ");
         fflush(stdout);
         scanf("%u", &baseInicial);
         fflush(stdin);
 
-        printf("\nDigite agora a base para que se deseja converter o numero:\n");
+        printf("\nDigite agora a base para que se deseja converter o numero: ");
         fflush(stdout);
         scanf("%u", &baseDesejada);
         fflush(stdin);
-
-        printf("\nO numero %sna base %d convertido para a base %d eh igual a: \n\n", numeroInicial, baseInicial, baseDesejada);
-        fflush(stdout);
 
         replace(numeroInicial, ',', '.');
 
@@ -190,33 +213,18 @@ int main()
             ehNegativo = 1;
         }
 
+        resultado = calcular(numeroInicial, baseInicial, baseDesejada);
 
-        if(baseInicial == baseDesejada)
-            resultado = numeroInicial;
-        else
-        {
-            double nmrNaBaseDez;
-            if(baseInicial != 10)
-                nmrNaBaseDez = algumaParaDez(numeroInicial, baseInicial);
-            else
-                sscanf(numeroInicial, "%lf", &nmrNaBaseDez);
-
-            if(baseDesejada != 10)
-                resultado = dezParaOutra(nmrNaBaseDez, baseDesejada);
-            else
-            {
-                char buff[50];
-                sprintf(buff, "%f", nmrNaBaseDez);
-                resultado = buff;
-            }
-        }
+        printf("\nO resultado da conversao eh: ");
 
         if(ehNegativo) printf("-%s\n\n\n", resultado);
         else printf("%s\n", resultado);
 
+        printf("Digite 1 para continuar: ");
+        fflush(stdout);
 
-        printf("Digite \n1 - Para continuar");
         scanf("%d", &opcao);
+        fflush(stdin);
     }
     while(opcao == 1);
 
